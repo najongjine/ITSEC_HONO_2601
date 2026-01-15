@@ -26,6 +26,8 @@ app.get("/test", (c) => {
   }
 });
 
+import testRouter from "./router/test_router.js";
+
 serve(
   {
     fetch: app.fetch,
