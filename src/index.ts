@@ -1,13 +1,15 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import type { ResultType } from "./types/types.js";
+import type { HonoEnv, ResultType } from "./types/types.js";
 import * as dotenv from "dotenv";
+import { dbMiddleware } from "./db/neonvercel_db.js";
 
 const envFile =
   process.env.NODE_ENV == "production" ? ".env.production" : ".env.development";
 dotenv.config({ path: envFile });
 
-const app = new Hono();
+const app = new Hono<HonoEnv>();
+app.use("*", dbMiddleware);
 
 //http://localhost:3000
 app.get("/", (c) => {
