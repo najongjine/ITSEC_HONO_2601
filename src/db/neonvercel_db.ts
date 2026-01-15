@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { Pool } from "@neondatabase/serverless";
-import { HonoEnv } from "../types/types.js";
+import type { HonoEnv } from "../types/types.js";
 
 export const dbMiddleware = createMiddleware<HonoEnv>(async (c, next) => {
   // [수정 포인트 1] c.env에 없으면 process.env에서 찾도록 수정 (Node.js 호환성)
