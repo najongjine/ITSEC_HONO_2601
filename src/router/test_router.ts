@@ -5,7 +5,14 @@ const router = new Hono<HonoEnv>();
 
 router.get("/db_select_test", async (c) => {
   let result: ResultType = { success: true };
+  const db = c.var.db;
   try {
+    let _data = await db.query(
+      `
+        SELECT NOW();
+        `,
+      []
+    );
     return c.json(result);
   } catch (error: any) {
     result.success = false;
