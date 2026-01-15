@@ -13,6 +13,7 @@ router.get("/db_select_test", async (c) => {
         `,
       []
     );
+    result.data = _data;
     return c.json(result);
   } catch (error: any) {
     result.success = false;
