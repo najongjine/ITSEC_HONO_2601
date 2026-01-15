@@ -27,6 +27,7 @@ app.get("/test", (c) => {
 });
 
 import testRouter from "./router/test_router.js";
+app.route("/api/test", testRouter);
 
 serve(
   {
