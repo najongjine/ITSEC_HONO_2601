@@ -44,6 +44,21 @@ router.post("/formdata_body", async (c) => {
     let files = body["files"];
     console.log(`file : `, files);
     let mydata = body["mydata"];
+
+    const fileList: any[] = [];
+    if (files && !Array.isArray(files)) {
+      files = [files];
+    }
+    if (files?.length || 0) {
+      for (const e of files as File[]) {
+        fileList.push({
+          name: e?.name,
+          size: e?.size,
+          type: e?.type,
+        });
+      }
+    }
+
     result.data = { mydata, files: JSON.stringify(files) };
     return c.json(result);
   } catch (error: any) {
