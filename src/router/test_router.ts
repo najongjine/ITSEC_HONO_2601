@@ -59,7 +59,7 @@ router.post("/formdata_body", async (c) => {
       }
     }
 
-    result.data = { mydata, files: JSON.stringify(files) };
+    result.data = { mydata, files: fileList };
     return c.json(result);
   } catch (error: any) {
     result.success = false;
