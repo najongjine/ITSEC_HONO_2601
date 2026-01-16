@@ -42,8 +42,9 @@ router.post("/formdata_body", async (c) => {
   try {
     const body = await c.req.parseBody({ all: true });
     let files = body["files"];
+    console.log(`file : `, files);
     let mydata = body["mydata"];
-    result.data = { mydata, files };
+    result.data = { mydata, files: JSON.stringify(files) };
     return c.json(result);
   } catch (error: any) {
     result.success = false;
