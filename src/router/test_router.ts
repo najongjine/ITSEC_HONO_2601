@@ -27,7 +27,8 @@ router.get("/query_string", async (c) => {
   const db = c.var.db;
   try {
     let mydata = c.req.query("mydata");
-    result.data = mydata;
+    let mydata2 = c.req.query("mydata2");
+    result.data = { mydata, mydata2 };
     return c.json(result);
   } catch (error: any) {
     result.success = false;
