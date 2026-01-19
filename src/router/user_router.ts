@@ -46,6 +46,25 @@ router.post("/register", async (c) => {
     let password = String(body["password"]);
     password = password?.trim() || "";
 
+    if (!username || !password) {
+      result.success = false;
+      result.msg = "!error. username or password is required";
+      return c.json(result);
+    }
+
+    let _data = await db.query(
+      `
+        SELECT * FROM users WHERE username = $1;
+        `,
+      [username],
+    );
+
+    if (_data.rows.length > 0) {
+      result.success = false;
+      result.msg = "!error. username already exists";
+      return c.json(result);
+    }
+
     return c.json(result);
   } catch (error: any) {
     result.success = false;
