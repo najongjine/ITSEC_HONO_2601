@@ -46,9 +46,9 @@ router.post("/register", async (c) => {
   const db = c.var.db;
   try {
     const body = await c.req.parseBody({ all: true });
-    let username = String(body["username"]);
+    let username = String(body["username"] || "");
     username = username?.trim() || "";
-    let password = String(body["password"]);
+    let password = String(body["password"] || "");
     password = password?.trim() || "";
 
     if (!username || !password) {
@@ -102,9 +102,9 @@ router.post("/login", async (c) => {
   const db = c.var.db;
   try {
     const body = await c.req.parseBody({ all: true });
-    let username = String(body["username"]);
+    let username = String(body["username"] || "");
     username = username?.trim() || "";
-    let password = String(body["password"]);
+    let password = String(body["password"] || "");
     password = password?.trim() || "";
 
     if (!username || !password) {
@@ -113,19 +113,29 @@ router.post("/login", async (c) => {
       return c.json(result);
     }
 
-    let _data = await db.query(
+    let _data: any = await db.query(
       `
         SELECT * FROM t_user WHERE username = $1;
         `,
       [username],
     );
 
-    if (_data.rows.length > 0) {
+    if (!_data?.rows?.length) {
       result.success = false;
       result.msg = "!error. user not found";
       return c.json(result);
     }
-    let isMatch = await comparePassword(password, _data.rows[0]?.password);
+    _data = _data.rows[0];
+    let isMatch = await comparePassword(password, _data?.password);
+    if (!isMatch) {
+      result.success = false;
+      result.msg = "!error. invalid password";
+      return c.json(result);
+    }
+    _data.password = "";
+    const token = `Bearer ${generateToken(_data, "999d")}`;
+    console.log(`token: `, token);
+    result.data = { userInfo: _data, token: token };
 
     return c.json(result);
   } catch (error: any) {
