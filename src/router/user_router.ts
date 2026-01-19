@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv, ResultType } from "../types/types.js";
+import { hashPassword } from "../utils/utils.js";
 
 const router = new Hono<HonoEnv>();
 
@@ -64,6 +65,13 @@ router.post("/register", async (c) => {
       result.msg = "!error. username already exists";
       return c.json(result);
     }
+    let encPassword = await hashPassword(password);
+    let _data2 = await db.query(
+      `
+        INSERT INTO users (username, password) VALUES ($1, $2);
+        `,
+      [username, encPassword],
+    );
 
     return c.json(result);
   } catch (error: any) {
