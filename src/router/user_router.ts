@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import type { HonoEnv, ResultType } from "../types/types.js";
-import { hashPassword, generateToken } from "../utils/utils.js";
+import {
+  hashPassword,
+  generateToken,
+  comparePassword,
+} from "../utils/utils.js";
 
 const router = new Hono<HonoEnv>();
 
@@ -81,6 +85,44 @@ router.post("/register", async (c) => {
     const token = `Bearer ${generateToken(_data2, "999d")}`;
     console.log(`token: `, token);
     result.data = { userInfo: _data2, token: token };
+
+    return c.json(result);
+  } catch (error: any) {
+    result.success = false;
+    result.msg = `!error. ${error?.message}`;
+    return c.json(result);
+  }
+});
+
+router.post("/login", async (c) => {
+  let result: ResultType = { success: true };
+  const db = c.var.db;
+  try {
+    const body = await c.req.parseBody({ all: true });
+    let username = String(body["username"]);
+    username = username?.trim() || "";
+    let password = String(body["password"]);
+    password = password?.trim() || "";
+
+    if (!username || !password) {
+      result.success = false;
+      result.msg = "!error. username or password is required";
+      return c.json(result);
+    }
+
+    let _data = await db.query(
+      `
+        SELECT * FROM t_user WHERE username = $1;
+        `,
+      [username],
+    );
+
+    if (_data.rows.length > 0) {
+      result.success = false;
+      result.msg = "!error. user not found";
+      return c.json(result);
+    }
+    let isMatch = await comparePassword(password, _data.rows[0]?.password);
 
     return c.json(result);
   } catch (error: any) {
