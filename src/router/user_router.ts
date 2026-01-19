@@ -55,7 +55,7 @@ router.post("/register", async (c) => {
 
     let _data = await db.query(
       `
-        SELECT * FROM users WHERE username = $1;
+        SELECT * FROM t_user WHERE username = $1;
         `,
       [username],
     );
