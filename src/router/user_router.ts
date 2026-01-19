@@ -66,6 +66,8 @@ router.post("/register", async (c) => {
       return c.json(result);
     }
     let encPassword = await hashPassword(password);
+    console.log(`password: `, password);
+    console.log(`encPassword: `, encPassword);
     let _data2 = await db.query(
       `
         INSERT INTO t_user (username, password) VALUES ($1, $2)
