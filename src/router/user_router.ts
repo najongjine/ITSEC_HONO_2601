@@ -68,7 +68,7 @@ router.post("/register", async (c) => {
     let encPassword = await hashPassword(password);
     let _data2 = await db.query(
       `
-        INSERT INTO users (username, password) VALUES ($1, $2);
+        INSERT INTO t_user (username, password) VALUES ($1, $2);
         `,
       [username, encPassword],
     );
