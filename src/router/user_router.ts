@@ -75,7 +75,7 @@ router.post("/register", async (c) => {
     );
     console.log(`_data2: `, _data2);
     _data2 = _data2.rows[0] || {};
-    const token = generateToken(_data2, "999d");
+    const token = `Bearer ${generateToken(_data2, "999d")}`;
     console.log(`token: `, token);
     result.data = { userInfo: _data2, token: token };
 
