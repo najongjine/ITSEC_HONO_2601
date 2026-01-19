@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { HonoEnv, ResultType } from "../types/types.js";
-import { hashPassword } from "../utils/utils.js";
+import { hashPassword, generateToken } from "../utils/utils.js";
 
 const router = new Hono<HonoEnv>();
 
@@ -68,10 +68,16 @@ router.post("/register", async (c) => {
     let encPassword = await hashPassword(password);
     let _data2 = await db.query(
       `
-        INSERT INTO t_user (username, password) VALUES ($1, $2);
+        INSERT INTO t_user (username, password) VALUES ($1, $2)
+        RETURNING *;
         `,
       [username, encPassword],
     );
+    console.log(`_data2: `, _data2);
+    _data2 = _data2.rows[0] || {};
+    const token = generateToken(_data2, "999d");
+    console.log(`token: `, token);
+    result.data = { userInfo: _data2, token: token };
 
     return c.json(result);
   } catch (error: any) {

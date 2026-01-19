@@ -29,6 +29,9 @@ app.get("/test", (c) => {
 import testRouter from "./router/test_router.js";
 app.route("/api/test", testRouter);
 
+import userRouter from "./router/user_router.js";
+app.route("/api/user", userRouter);
+
 serve(
   {
     fetch: app.fetch,
@@ -36,5 +39,5 @@ serve(
   },
   (info) => {
     console.log(`Server is running on http://localhost:${info.port}`);
-  }
+  },
 );
