@@ -94,6 +94,9 @@ router.post("/register", async (c) => {
   }
 });
 
+/** username, password 가 맞으면 token 만들어서
+ * register 의 응답 형식과 똑같이 해주면 되요
+ */
 router.post("/login", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
