@@ -11,7 +11,7 @@ router.get("/db_select_test", async (c) => {
       `
         SELECT NOW();
         `,
-      []
+      [],
     );
     result.data = _data;
     return c.json(result);
@@ -41,25 +41,11 @@ router.post("/register", async (c) => {
   const db = c.var.db;
   try {
     const body = await c.req.parseBody({ all: true });
-    let files = body["files"];
-    console.log(`file : `, files);
-    let mydata = body["mydata"];
+    let username = String(body["username"]);
+    username = username?.trim() || "";
+    let password = String(body["password"]);
+    password = password?.trim() || "";
 
-    const fileList: any[] = [];
-    if (files && !Array.isArray(files)) {
-      files = [files];
-    }
-    if (files?.length || 0) {
-      for (const e of files as File[]) {
-        fileList.push({
-          name: e?.name,
-          size: e?.size,
-          type: e?.type,
-        });
-      }
-    }
-
-    result.data = { mydata, files: fileList };
     return c.json(result);
   } catch (error: any) {
     result.success = false;
