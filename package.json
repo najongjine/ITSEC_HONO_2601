@@ -9,8 +9,6 @@
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "@neondatabase/serverless": "^1.0.2",
-    "@types/bcrypt": "^6.0.0",
-    "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
@@ -19,8 +17,11 @@
     "rimraf": "^6.1.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.19.30",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.3"
   }
 }
