@@ -10,7 +10,7 @@ const envFile =
 dotenv.config({ path: envFile });
 
 const app = new Hono<HonoEnv>();
-app.use("*", cors());
+app.use("*", cors()); // cors 허용
 app.use("*", dbMiddleware);
 
 //http://localhost:3000
