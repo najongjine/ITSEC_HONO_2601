@@ -1,5 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import type { HonoEnv, ResultType } from "./types/types.js";
 import * as dotenv from "dotenv";
 import { dbMiddleware } from "./db/neonvercel_db.js";
@@ -9,6 +10,7 @@ const envFile =
 dotenv.config({ path: envFile });
 
 const app = new Hono<HonoEnv>();
+app.use("*", cors());
 app.use("*", dbMiddleware);
 
 //http://localhost:3000
