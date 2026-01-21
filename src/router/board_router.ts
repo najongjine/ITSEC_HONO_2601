@@ -61,11 +61,11 @@ router.post("/upsert", async (c) => {
 
     let _data: any = await db.query(
       `
-        INSERT INTO t_board (title, content) 
-        VALUES ($1, $2)
+        INSERT INTO t_board (title, content, user_id) 
+        VALUES ($1, $2, $3)
         RETURNING *;
         `,
-      [title, content],
+      [title, content, userData?.id],
     );
 
     if (!_data?.rows?.length) {
