@@ -31,40 +31,33 @@ router.post("/login", async (c) => {
   const db = c.var.db;
   try {
     const body = await c.req.parseBody({ all: true });
-    let username = String(body["username"] || "");
-    username = username?.trim() || "";
-    let password = String(body["password"] || "");
-    password = password?.trim() || "";
+    let title = String(body["title"] || "");
+    title = title?.trim() || "";
+    let content = String(body["content"] || "");
+    content = content?.trim() || "";
 
-    if (!username || !password) {
+    if (!title || !content) {
       result.success = false;
-      result.msg = "!error. username or password is required";
+      result.msg = "!error. 제목과 내용은 필수로 입력 해야되요";
       return c.json(result);
     }
 
     let _data: any = await db.query(
       `
-        SELECT * FROM t_user WHERE username = $1;
+        INSERT INTO t_board (title, content) 
+        VALUES ($1, $2)
+        RETURNING *;
         `,
-      [username],
+      [title, content],
     );
 
     if (!_data?.rows?.length) {
       result.success = false;
-      result.msg = "!error. user not found";
+      result.msg = "!error. 게시글 작성 실패";
       return c.json(result);
     }
-    _data = _data.rows[0];
-    let isMatch = await comparePassword(password, _data?.password);
-    if (!isMatch) {
-      result.success = false;
-      result.msg = "!error. invalid password";
-      return c.json(result);
-    }
-    _data.password = "";
-    const token = `Bearer ${generateToken(_data, "999d")}`;
-    console.log(`token: `, token);
-    result.data = { userInfo: _data, token: token };
+    _data = _data?.rows[0] || {};
+    result.data = _data;
 
     return c.json(result);
   } catch (error: any) {
