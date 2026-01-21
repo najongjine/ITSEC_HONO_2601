@@ -4,6 +4,7 @@ import {
   hashPassword,
   generateToken,
   comparePassword,
+  verifyToken,
 } from "../utils/utils.js";
 
 const router = new Hono<HonoEnv>();
@@ -30,6 +31,22 @@ router.post("/upsert", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
   try {
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      result.success = false;
+      result.msg = "!error. 토큰이 유효하지 않습니다(Header).";
+      return c.json(result);
+    }
+
+    const token = authHeader.split(" ")[1];
+    let userData: any = verifyToken(token);
+    console.log(`userData: `, userData?.id);
+    if (!userData) {
+      result.success = false;
+      result.msg = "!error. 토큰이 유효하지 않습니다(verify).";
+      return c.json(result);
+    }
+
     const body = await c.req.parseBody({ all: true });
     let title = String(body["title"] || "");
     title = title?.trim() || "";
