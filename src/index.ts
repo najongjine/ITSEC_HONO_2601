@@ -34,6 +34,9 @@ app.route("/api/test", testRouter);
 import userRouter from "./router/user_router.js";
 app.route("/api/user", userRouter);
 
+import boardRouter from "./router/board_router.js";
+app.route("/api/board", boardRouter);
+
 serve(
   {
     fetch: app.fetch,
