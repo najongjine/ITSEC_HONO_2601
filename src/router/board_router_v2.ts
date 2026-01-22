@@ -14,7 +14,23 @@ router.get("/get_memo_by_id", async (c) => {
   const db = c.var.db;
   try {
     let id = Number(c.req.query("id") || 0);
-
+    let _data = await db.query(
+      `
+        SELECT
+        b.id
+        ,b.user_id as userId
+        ,b.title
+        ,b.content
+        ,b.created_dt as createdDt
+        ,b.updated_dt as updatedDt
+        FROM t_board as b
+        LEFT JOIN t_user as u ON u.id=b.user_id
+        WHERE b.id = $1
+        ORDER BY b.id DESC
+        
+        `,
+      [id],
+    );
     return c.json(result);
   } catch (error: any) {
     result.success = false;
