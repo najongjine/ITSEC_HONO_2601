@@ -9,13 +9,12 @@ import {
 
 const router = new Hono<HonoEnv>();
 
-router.get("/query_string", async (c) => {
+router.get("/get_memo_by_id", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
   try {
-    let mydata = c.req.query("mydata");
-    let mydata2 = c.req.query("mydata2");
-    result.data = { mydata, mydata2 };
+    let id = Number(c.req.query("id") || 0);
+
     return c.json(result);
   } catch (error: any) {
     result.success = false;
