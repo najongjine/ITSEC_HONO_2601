@@ -80,14 +80,39 @@ router.post("/upsert", async (c) => {
       return c.json(result);
     }
 
-    let _data: any = await db.query(
-      `
-        INSERT INTO t_board (title, content, user_id) 
-        VALUES ($1, $2, $3)
-        RETURNING *;
-        `,
-      [title, content, userData?.id],
-    );
+    /* id ==0 일때는 insert, 아니면 update */
+
+    let _data: any;
+
+    if (id > 0) {
+      // ✅ UPDATE: content 제외, 파라미터 순서 재정렬 ($1 ~ $5)
+      const updateQuery = `
+    UPDATE t_board 
+    SET title = $1, 
+        html = $2, 
+        json = $3,
+        updated_dt = NOW() 
+    WHERE id = $4 AND user_id = $5
+    RETURNING *;
+  `;
+      // 순서: title, html, json, id, user_id
+      _data = await db.query(updateQuery, [
+        title,
+        html,
+        json,
+        id,
+        userData?.id,
+      ]);
+    } else {
+      // ✅ INSERT: content 제외, 파라미터 순서 재정렬 ($1 ~ $4)
+      const insertQuery = `
+    INSERT INTO t_board (title, html, json, user_id, created_dt) 
+    VALUES ($1, $2, $3, $4, NOW())
+    RETURNING *;
+  `;
+      // 순서: title, html, json, user_id
+      _data = await db.query(insertQuery, [title, html, json, userData?.id]);
+    }
 
     if (!_data?.rows?.length) {
       result.success = false;
