@@ -74,7 +74,7 @@ router.post("/upsert", async (c) => {
     html = html?.trim() || "";
     let json: any = body["json"] || {};
 
-    if (!title || !html) {
+    if (!title || !html || !json) {
       result.success = false;
       result.msg = "!error. 제목과 내용은 필수로 입력 해야되요";
       return c.json(result);
