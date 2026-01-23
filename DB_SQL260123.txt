@@ -1,0 +1,3 @@
+ALTER TABLE t_board
+ADD COLUMN html TEXT,
+ADD COLUMN json JSONB;
