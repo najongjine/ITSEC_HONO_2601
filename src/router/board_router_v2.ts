@@ -43,6 +43,39 @@ router.get("/get_memo_by_id", async (c) => {
   }
 });
 
+router.get("/get_memo", async (c) => {
+  let result: ResultType = { success: true };
+  const db = c.var.db;
+  try {
+    let id = Number(c.req.query("id") || 0);
+    let _data: any = await db.query(
+      `
+        SELECT
+        b.id
+        ,b.user_id as userId
+        ,b.title
+        ,b.content
+        ,b.created_dt as createdDt
+        ,b.updated_dt as updatedDt
+        ,b.html as htmlContent
+        ,b.json as jsonContent
+        FROM t_board as b
+        LEFT JOIN t_user as u ON u.id=b.user_id
+        ORDER BY b.id DESC
+        LIMIT 5000
+        `,
+      [],
+    );
+    _data = _data.rows || [];
+    result.data = _data;
+    return c.json(result);
+  } catch (error: any) {
+    result.success = false;
+    result.msg = `!error. ${error?.message}`;
+    return c.json(result);
+  }
+});
+
 /** username, password 가 맞으면 token 만들어서
  * register 의 응답 형식과 똑같이 해주면 되요
  */
