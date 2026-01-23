@@ -90,8 +90,8 @@ router.post("/upsert", async (c) => {
     if (id > 0) {
       // ✅ UPDATE: content 제외, 파라미터 순서 재정렬 ($1 ~ $5)
       const updateQuery = `
-    UPDATE t_board 
-    SET title = $1, 
+    UPDATE t_board SET 
+        title = $1, 
         html = $2, 
         json = $3,
         updated_dt = NOW() 
