@@ -59,20 +59,23 @@ router.post("/upsert", async (c) => {
 
     const token = authHeader.split(" ")[1];
     let userData: any = verifyToken(token);
-    console.log(`userData: `, userData?.id);
     if (!userData) {
       result.success = false;
       result.msg = "!error. 토큰이 유효하지 않습니다(verify).";
       return c.json(result);
     }
 
-    const body = await c.req.parseBody({ all: true });
-    let id = Number(body["id"] || 0);
-    let title = String(body["title"] || "");
+    const body = await c?.req?.json();
+    let id = Number(body?.id ?? 0);
+    let title = String(body?.title ?? "");
     title = title?.trim() || "";
-    let html = String(body["html"] || "");
+    let html = String(body?.html ?? "");
     html = html?.trim() || "";
-    let json: any = body["json"] || {};
+    let json: any = body?.json ?? null; // JSON 객체
+
+    console.log(`title: `, title);
+    console.log(`html: `, html);
+    console.log(`json: `, json);
 
     if (!title || !html || !json) {
       result.success = false;
@@ -113,6 +116,7 @@ router.post("/upsert", async (c) => {
       // 순서: title, html, json, user_id
       _data = await db.query(insertQuery, [title, html, json, userData?.id]);
     }
+    console.log(`# _data: `, _data.rows);
 
     if (!_data?.rows?.length) {
       result.success = false;
