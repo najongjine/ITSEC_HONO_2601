@@ -67,12 +67,14 @@ router.post("/upsert", async (c) => {
     }
 
     const body = await c.req.parseBody({ all: true });
+    let id = Number(body["id"] || 0);
     let title = String(body["title"] || "");
     title = title?.trim() || "";
-    let content = String(body["content"] || "");
-    content = content?.trim() || "";
+    let html = String(body["html"] || "");
+    html = html?.trim() || "";
+    let json: any = body["json"] || {};
 
-    if (!title || !content) {
+    if (!title || !html) {
       result.success = false;
       result.msg = "!error. 제목과 내용은 필수로 입력 해야되요";
       return c.json(result);
