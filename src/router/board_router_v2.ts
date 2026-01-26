@@ -18,13 +18,13 @@ router.get("/get_memo_by_id", async (c) => {
       `
         SELECT
         b.id
-        ,b.user_id as userId
+        ,b.user_id as "userId"
         ,b.title
         ,b.content
-        ,b.created_dt as createdDt
-        ,b.updated_dt as updatedDt
-        ,b.html as htmlContent
-        ,b.json as jsonContent
+        ,b.created_dt as "createdDt"
+        ,b.updated_dt as "updatedDt"
+        ,b.html as "htmlContent"
+        ,b.json as "jsonContent"
         FROM t_board as b
         LEFT JOIN t_user as u ON u.id=b.user_id
         WHERE b.id = $1
