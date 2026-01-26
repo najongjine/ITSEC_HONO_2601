@@ -169,7 +169,7 @@ router.post("/upsert", async (c) => {
   }
 });
 
-router.post("/upsert", async (c) => {
+router.post("/delete_by_id", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
   try {
