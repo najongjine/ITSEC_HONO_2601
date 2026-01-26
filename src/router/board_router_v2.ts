@@ -25,6 +25,7 @@ router.get("/get_memo_by_id", async (c) => {
         ,b.updated_dt as "updatedDt"
         ,b.html as "htmlContent"
         ,b.json as "jsonContent"
+        ,u.username
         FROM t_board as b
         LEFT JOIN t_user as u ON u.id=b.user_id
         WHERE b.id = $1
