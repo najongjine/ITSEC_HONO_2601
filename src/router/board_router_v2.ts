@@ -213,6 +213,12 @@ router.post("/delete_by_id", async (c) => {
     );
     _data = _data.rows[0] || {};
 
+    if ((userData?.id || -1) != (_data?.userId || -2)) {
+      result.success = false;
+      result.msg = "!error. 사용자 검증 실패.";
+      return c.json(result);
+    }
+
     return c.json(result);
   } catch (error: any) {
     result.success = false;
