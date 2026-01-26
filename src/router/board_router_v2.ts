@@ -219,6 +219,15 @@ router.post("/delete_by_id", async (c) => {
       return c.json(result);
     }
 
+    let _data2: any = await db.query(
+      `
+       DELETE FROM t_board
+       WHERE id = $1
+            RETURNING *;
+        `,
+      [id],
+    );
+
     return c.json(result);
   } catch (error: any) {
     result.success = false;
