@@ -52,13 +52,14 @@ router.get("/get_memo", async (c) => {
       `
         SELECT
         b.id
-        ,b.user_id as userId
+        ,b.user_id as "userId"
         ,b.title
         ,b.content
-        ,b.created_dt as createdDt
-        ,b.updated_dt as updatedDt
-        ,b.html as htmlContent
-        ,b.json as jsonContent
+        ,b.created_dt as "createdDt"
+        ,b.updated_dt as "updatedDt"
+        ,b.html as "htmlContent"
+        ,b.json as "jsonContent"
+        ,u.username
         FROM t_board as b
         LEFT JOIN t_user as u ON u.id=b.user_id
         ORDER BY b.id DESC
