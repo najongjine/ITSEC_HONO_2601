@@ -8,10 +8,11 @@ router.post("/insert_embedding", async (c) => {
   const db = c.var.db;
   try {
     const body = await c.req.json();
-    let text = body?.text ?? "";
-    if (!text) {
+    let title = body?.title ?? "";
+    let content = body?.content ?? "";
+    if (!title || !content) {
       result.success = false;
-      result.msg = "!error. text is required";
+      result.msg = "!error. title or content is required";
       return c.json(result);
     }
 
