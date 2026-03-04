@@ -40,6 +40,9 @@ app.route("/api/board", boardRouter);
 import boardRouterV2 from "./router/board_router_v2.js";
 app.route("/api/board_v2", boardRouterV2);
 
+import embeddingRouter from "./router/embedding_router.js";
+app.route("/api/embedding", embeddingRouter);
+
 serve(
   {
     fetch: app.fetch,
