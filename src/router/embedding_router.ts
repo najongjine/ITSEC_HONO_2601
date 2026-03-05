@@ -96,13 +96,19 @@ router.get("/search_embedding", async (c) => {
     /* 임베딩화된 검색어를 사용하여 t_test_textembedding 테이블에서 벡터 검색하기 */
     const _data = await db.query(
       `
-      SELECT *, 
-        (1 - LEAST(title_embedding <=> $1, content_embedding <=> $1)) as similarity 
-      FROM t_test_textembedding 
-      ORDER BY LEAST(title_embedding <=> $1, content_embedding <=> $1) ASC 
-      LIMIT 10;
+SELECT 
+    id, title,
+    -- ts_rank를 사용하여 키워드 연관도 점수 산출
+    ts_rank_cd(to_tsvector('simple', title || ' ' || content), plainto_tsquery('simple', $2)) AS word_rank,
+    (1 - (title_embedding <=> $1)) AS s_rank,
+    -- 두 점수를 적절히 배합 (예: 키워드 7 : 벡터 3)
+    (ts_rank_cd(to_tsvector('simple', title || ' ' || content), plainto_tsquery('simple', $2)) * 0.7 +
+     (1 - (title_embedding <=> $1)) * 0.3) as hybrid_score
+FROM t_test_textembedding
+ORDER BY hybrid_score DESC
+LIMIT 10;
       `,
-      [JSON.stringify(queryEmbedding)],
+      [JSON.stringify(queryEmbedding), query],
     );
 
     result.data = _data.rows || [];
