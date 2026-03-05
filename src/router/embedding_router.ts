@@ -74,4 +74,26 @@ router.post("/insert_embedding", async (c) => {
     return c.json(result);
   }
 });
+
+router.get("/search_embedding", async (c) => {
+  let result: ResultType = { success: true };
+  const db = c.var.db;
+  try {
+    let query = String(c?.req?.query("query")) ?? "";
+    if (!query) {
+      result.success = false;
+      result.msg = "!error. query is required";
+      return c.json(result);
+    }
+    /* 사용자의 query(검색어) 를 ai 서버에 보내서 임베딩화 하기  */
+
+    /* 임베딩화된 검색어를 사용하여 t_test_textembedding 테이블에서 벡터 검색하기 */
+    return c.json(result);
+  } catch (error: any) {
+    result.success = false;
+    result.msg = `!error. ${error?.message}`;
+    return c.json(result);
+  }
+});
+
 export default router;
