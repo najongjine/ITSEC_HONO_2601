@@ -86,8 +86,26 @@ router.get("/search_embedding", async (c) => {
       return c.json(result);
     }
     /* 사용자의 query(검색어) 를 ai 서버에 보내서 임베딩화 하기  */
+    const queryEmbedding = await getEmbedding(query);
+    if (!queryEmbedding) {
+      result.success = false;
+      result.msg = "!error. embedding failed";
+      return c.json(result);
+    }
 
     /* 임베딩화된 검색어를 사용하여 t_test_textembedding 테이블에서 벡터 검색하기 */
+    const _data = await db.query(
+      `
+      SELECT *, 
+        (1 - LEAST(title_embedding <=> $1, content_embedding <=> $1)) as similarity 
+      FROM t_test_textembedding 
+      ORDER BY LEAST(title_embedding <=> $1, content_embedding <=> $1) ASC 
+      LIMIT 10;
+      `,
+      [JSON.stringify(queryEmbedding)],
+    );
+
+    result.data = _data.rows || [];
     return c.json(result);
   } catch (error: any) {
     result.success = false;
