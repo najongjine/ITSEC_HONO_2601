@@ -32,9 +32,9 @@ router.post("/insert_embedding", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
   try {
-    const body = await c.req.json();
-    let title = body?.title ?? "";
-    let content = body?.content ?? "";
+    const body = await c.req.parseBody();
+    let title = (body?.title as string) ?? "";
+    let content = (body?.content as string) ?? "";
     if (!title || !content) {
       result.success = false;
       result.msg = "!error. title or content is required";
