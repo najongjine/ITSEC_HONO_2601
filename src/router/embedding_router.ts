@@ -235,4 +235,55 @@ LIMIT 10;
   }
 });
 
+router.post("/search_image", async (c) => {
+  let result: ResultType = { success: true };
+  try {
+    const body = await c.req.parseBody();
+    const files = body["file"];
+
+    if (!files) {
+      result.success = false;
+      result.msg = "!error. file is required";
+      return c.json(result);
+    }
+
+    const fileArray = Array.isArray(files) ? files : [files];
+    const imageFiles = fileArray.filter((f): f is File => f instanceof File);
+
+    if (imageFiles.length === 0) {
+      result.success = false;
+      result.msg = "!error. no valid files provided";
+      return c.json(result);
+    }
+
+    const db = c.var.db;
+    const searchFile = imageFiles[0];
+    const embedding = await getImageEmbedding(searchFile);
+
+    if (!embedding) {
+      result.success = false;
+      result.msg = "!error. image embedding failed";
+      return c.json(result);
+    }
+
+    const query = `
+      SELECT 
+        id, url, title, mimetype,
+        (1 - (img_embedding <=> $1)) as score
+      FROM t_test_imgembedding
+      ORDER BY score DESC
+      LIMIT 10;
+    `;
+
+    const dbResult = await db.query(query, [JSON.stringify(embedding)]);
+    result.data = dbResult.rows || [];
+
+    return c.json(result);
+  } catch (error: any) {
+    result.success = false;
+    result.msg = `!error. ${error?.message}`;
+    return c.json(result);
+  }
+});
+
 export default router;
