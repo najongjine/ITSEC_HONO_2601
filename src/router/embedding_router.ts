@@ -75,6 +75,121 @@ router.post("/insert_embedding", async (c) => {
   }
 });
 
+async function getImageEmbedding(file: File): Promise<number[] | null> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(
+      "https://wildojisan-rag-hf-wildojisan.hf.space/image_embedding/image_to_embedding",
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+    if (!response.ok) return null;
+    const json: any = await response.json();
+    if (json?.success && json?.data?.embedding) {
+      return json.data.embedding;
+    }
+    return null;
+  } catch (error) {
+    console.error("Image Embedding API error:", error);
+    return null;
+  }
+}
+
+async function uploadToImgBB(file: File): Promise<string | null> {
+  try {
+    const key = process.env.IMGBB_KEY;
+    if (!key) {
+      console.error("IMGBB_KEY is missing");
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("key", key);
+    formData.append("image", file);
+
+    const response = await fetch("https://api.imgbb.com/1/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) return null;
+    const json: any = await response.json();
+    return json?.data?.url || null;
+  } catch (error) {
+    console.error("ImgBB Upload API error:", error);
+    return null;
+  }
+}
+
+router.post("/insert_image_embedding", async (c) => {
+  let result: ResultType = { success: true };
+  try {
+    const body = await c.req.parseBody();
+    const files = body["file"];
+
+    if (!files) {
+      result.success = false;
+      result.msg = "!error. file is required";
+      return c.json(result);
+    }
+
+    const fileArray = Array.isArray(files) ? files : [files];
+    const imageFiles = fileArray.filter((f): f is File => f instanceof File);
+
+    if (imageFiles.length === 0) {
+      result.success = false;
+      result.msg = "!error. no valid files provided";
+      return c.json(result);
+    }
+
+    const db = c.var.db;
+    const results = await Promise.all(
+      imageFiles.map(async (file) => {
+        const title = file.name;
+        const mimetype = file.type;
+
+        const [embedding, url] = await Promise.all([
+          getImageEmbedding(file),
+          uploadToImgBB(file),
+        ]);
+
+        if (embedding && url) {
+          const query = `
+            INSERT INTO t_test_imgembedding (url, img_embedding, title, mimetype)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
+          `;
+          const dbResult = await db.query(query, [
+            url,
+            JSON.stringify(embedding),
+            title,
+            mimetype,
+          ]);
+          return dbResult.rows[0];
+        }
+        return {
+          embedding,
+          url,
+          title,
+          mimetype,
+          error: "failed to process image",
+        };
+      }),
+    );
+
+    result.data = { results };
+    return c.json(result);
+  } catch (error: any) {
+    result.success = false;
+    result.msg = `!error. ${error?.message}`;
+    return c.json(result);
+  }
+});
+
 router.get("/search_embedding", async (c) => {
   let result: ResultType = { success: true };
   const db = c.var.db;
